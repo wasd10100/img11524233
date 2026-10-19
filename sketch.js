@@ -1,65 +1,70 @@
+// Copyright (c) 2019 ml5
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
 
+/* ===
+ml5 Example
+Webcam Image Classification using a pre-trained customized model and p5.js
+This example uses p5 preload function to create the classifier
+=== */
+
+// Classifier Variable
 let classifier;
-let imageModelURL = 'https://wasd10100.github.io/img11524233/';
+// Model URL
+let imageModelURL = 'https://teachablemachine.withgoogle.com/models/bXy2kDNi/';
 
+// Video
 let video;
+let flippedVideo;
+// To store the classification
 let label = "";
 
-// 載入模型
+// Load the model first
 function preload() {
-  classifier = ml5.imageClassifier(
-    imageModelURL + 'model.json'
-  );
+  classifier = ml5.imageClassifier(imageModelURL + 'model.json');
 }
 
 function setup() {
-  createCanvas(320, 320);
-
-  // 使用後置鏡頭
-  const constraints = {
-    audio: false,
-    video: {
-      facingMode: {
-        exact: "environment"
-      }
-    }
-  };
-
-  video = createCapture(constraints);
-  video.size(320, 320);
+  createCanvas(320, 260);
+  // Create the video
+  video = createCapture(VIDEO);
+  video.size(320, 240);
   video.hide();
 
-  // 開始辨識
+  flippedVideo = ml5.flipImage(video)
+  // Start classifying
   classifyVideo();
 }
 
 function draw() {
   background(0);
+  // Draw the video
+  image(flippedVideo, 0, 0);
 
-  // 顯示攝影機畫面
-  image(video, 0, 0, width, height);
-
-  // 顯示辨識結果
+  // Draw the label
   fill(255);
   textSize(16);
   textAlign(CENTER);
   text(label, width / 2, height - 4);
 }
 
-// 取得影像分類結果
+// Get a prediction for the current video frame
 function classifyVideo() {
-  classifier.classify(video, gotResult);
+  flippedVideo = ml5.flipImage(video)
+  classifier.classify(flippedVideo, gotResult);
 }
 
-// 接收辨識結果
+// When we get a result
 function gotResult(error, results) {
+  // If there is an error
   if (error) {
     console.error(error);
     return;
   }
-
+  // The results are in an array ordered by confidence.
+  // console.log(results[0]);
   label = results[0].label;
-
-  // 繼續辨識下一張影像
+  // Classifiy again!
   classifyVideo();
 }
