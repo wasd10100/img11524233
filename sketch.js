@@ -68,6 +68,20 @@ function setup() {
   classifyVideo();
 
 }
+
+  video = createCapture(constraints);
+
+  video.size(320, 320);
+
+  video.hide();
+
+  flippedVideo = ml5.flipImage(video)
+
+  // Start classifying
+
+  classifyVideo();
+
+}
 function draw() {
   background(0);
   // Draw the video
